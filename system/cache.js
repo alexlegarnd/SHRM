@@ -69,8 +69,8 @@ class Cache {
                     logger.info(Cache.CLASSNAME,
                         `Adding new file: {channel: ${channel_name},version: ${version_name}, file: ${file_name}}`);
                     this.saveCache();
-                    return true;
                 }
+                return true;
             }
         }
         logger.warning(Cache.CLASSNAME,

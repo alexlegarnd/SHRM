@@ -20,13 +20,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="25b0b385-cdf1-4e4f-b809-d1289d1e968a" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/system/cache.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/system/logger.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/system/tools.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config.json" beforeDir="false" afterPath="$PROJECT_DIR$/config.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/system/file.js" beforeDir="false" afterPath="$PROJECT_DIR$/system/file.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/system/path.js" beforeDir="false" afterPath="$PROJECT_DIR$/system/path.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/system/cache.js" beforeDir="false" afterPath="$PROJECT_DIR$/system/cache.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -74,6 +69,7 @@
       <workItem from="1597161866311" duration="3587000" />
       <workItem from="1597344502934" duration="6474000" />
       <workItem from="1597520421282" duration="5581000" />
+      <workItem from="1597526261231" duration="83000" />
     </task>
     <servers />
   </component>
@@ -90,6 +86,7 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
     <state x="499" y="159" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1597164863162">
