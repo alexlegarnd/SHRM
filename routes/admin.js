@@ -1,12 +1,24 @@
 const express = require('express');
 const router = express.Router();
-const system_path = require('../system/path');
 const result = require('../system/request.result.enum');
+const system_authentication = require('../system/authentication');
+const system_path = require('../system/path');
+
 
 router.use((req, res, next) => {
-    // Check token and auth
-    next();
+    console.debug(req.path);
+    if (req.path !== '/login') {
+        if (req.headers['authorization']) {
+            system_authentication.tokenHandler(req, res, next);
+        } else {
+            res.send({ status: result.FAILED, message: 'this route is private' });
+        }
+    } else {
+        next();
+    }
 });
+
+router.get('/login', system_authentication.credentialHandler);
 
 router.get('/new/channel/:channel', (req, res) => {
     const channel = req.params['channel'];

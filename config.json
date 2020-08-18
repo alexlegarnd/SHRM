@@ -2,5 +2,6 @@
   "repo_path": "C:/test_repo",
   "repo_name": "Test Repo",
   "port": "8080",
-  "debug": true
+  "debug": true,
+  "token_validity":  "2h"
 }
