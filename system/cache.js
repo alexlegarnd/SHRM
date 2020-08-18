@@ -13,6 +13,15 @@ class Cache {
 
     app_folder = `${tools.addTrailingSeparatorPath(configuration.getProperty('repo_path'))}.shrm`
 
+    constructor() {
+        if(fs.existsSync(`${this.app_folder}/.cache`)) {
+            this.loadCache();
+            this.checkIntegrity();
+        } else {
+            this.rebuildCache();
+        }
+    }
+
     async addChannel(channel_name) {
         const n = this.cache.filter((c) => c.name === channel_name).length;
         if (n === 0) {
@@ -84,10 +93,103 @@ class Cache {
         }
         this.save_timeout = setTimeout(() => {
             fs.writeFile(`${this.app_folder}/.cache`, JSON.stringify(this.cache), function (err) {
-                if (err) return console.log(err);
+                if (err) {
+                    logger.error(Cache.CLASSNAME, err);
+                    return;
+                }
                 logger.info(Cache.CLASSNAME, 'Cache saved');
             });
         }, configuration.getProperty('timeout_saving', 3500));
+    }
+
+    loadCache() {
+        const path = `${this.app_folder}/.cache`;
+        if(fs.existsSync(path)) {
+            logger.info(Cache.CLASSNAME, 'Loading cache');
+            try {
+                const buffer = fs.readFileSync(path, {flag: 'r', encoding: 'utf8'});
+                this.cache = JSON.parse(buffer.toString('utf8'));
+            } catch (e) {
+                logger.error(Cache.CLASSNAME, e);
+                this.cache = [];
+            }
+        }
+    }
+
+    checkIntegrity() {
+        logger.info(Cache.CLASSNAME, 'Checking integrity');
+        let isComplete = true;
+        const repo = tools.addTrailingSeparatorPath(configuration.getProperty('repo_path'));
+        for (const c of this.cache) {
+            if (fs.existsSync(`${repo}${c.name}`)) {
+                for (const v of c.item_child) {
+                    if (fs.existsSync(`${repo}${c.name}/${v.name}`)) {
+                        for (const f of v.item_child) {
+                            if (!fs.existsSync(`${repo}${c.name}/${v.name}/${f.name}`)) {
+                                isComplete = false;
+                            }
+                        }
+                    } else {
+                        isComplete = false;
+                    }
+                }
+            } else {
+                isComplete = false;
+            }
+        }
+
+        if (!isComplete) {
+            logger.warning(Cache.CLASSNAME, 'Cache corrupted');
+            this.rebuildCache();
+        } else {
+            logger.info(Cache.CLASSNAME, 'Cache complete');
+        }
+    }
+
+    rebuildCache() {
+        logger.info(Cache.CLASSNAME, 'Rebuild cache');
+        this.cache = [];
+        const repo = tools.addTrailingSeparatorPath(configuration.getProperty('repo_path'));
+        fs.readdir(repo, (err, files) => {
+            if (err) {
+                logger.error(Cache.CLASSNAME, err);
+                return;
+            }
+            for (const file of files) {
+                if ((file !== '.shrm')) {
+                    logger.info(Cache.CLASSNAME, `[Rebuild] Discovered channel: ${file}`)
+                    const c = {
+                        name: file,
+                        type: 'channel',
+                        item_child: []
+                    };
+                    this.rebuildFolder(`${repo}${file}`, c, 'version')
+                    this.cache.push(c);
+                }
+            }
+        });
+        this.saveCache();
+    }
+
+    rebuildFolder(path, c, type) {
+        fs.readdir(path, (err, files) => {
+            if (err) {
+                logger.error(Cache.CLASSNAME, err);
+                return;
+            }
+            for (const file of files) {
+                if (!file.endsWith('.md5') && !file.endsWith('.sha')) {
+                    logger.info(Cache.CLASSNAME, `[Rebuild] Discovered ${type}: ${file}`)
+                    const n = {
+                        name: file,
+                        type: type,
+                        item_child: []
+                    };
+                    this.rebuildFolder(`${path}/${file}`, c, 'file')
+                    c.item_child.push(n);
+                }
+            }
+        });
     }
 }
 

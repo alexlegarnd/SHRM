@@ -3,6 +3,10 @@ const router = express.Router();
 const system_path = require('../system/path');
 const result = require('../system/request.result.enum');
 
+router.use((req, res, next) => {
+    // Check token and auth
+    next();
+});
 
 router.get('/new/channel/:channel', (req, res) => {
     const channel = req.params['channel'];
