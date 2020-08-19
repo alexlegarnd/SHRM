@@ -7,7 +7,7 @@ class File {
     static CLASSNAME = 'File';
 
     static createMd5Hash(folder, file) {
-        const md5_filename = this.changeFileExtension(file.name, '.md5');
+        const md5_filename = `${file.name}.md5`
         const md5_content = `${file.md5} *${file.name}`;
         fs.writeFile(`${folder}/${md5_filename}`, md5_content, function (err) {
             if (err) return console.log(err);
@@ -16,7 +16,7 @@ class File {
     }
 
     static createSha1Hash(folder, file) {
-        const sha_filename = this.changeFileExtension(file.name, '.sha');
+        const sha_filename = `${file.name}.sha`
         const shasum = crypto.createHash('sha1');
         fs.readFile(`${folder}/${file.name}`, (err, buffer) => {
             if (!err) {
@@ -35,8 +35,8 @@ class File {
         });
     }
 
-    static changeFileExtension(filename, ext) {
-        return filename.substr(0, filename.lastIndexOf('.')) + ext;
+    static addToHistory(c, v, f) {
+        //fs.renameSync()
     }
 
 }

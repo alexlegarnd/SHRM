@@ -1,11 +1,13 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const fileupload = require('express-fileupload');
+const logger = require('./system/logger');
 
 const indexRouter = require('./routes/index');
 const adminRouter = require('./routes/admin');
 
 const app = express();
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -18,5 +20,10 @@ app.use(fileupload({
 
 app.use('/repo', indexRouter);
 app.use('/admin', adminRouter);
+
+app.use((err, req, res, next) => {
+    logger.error('Error Handler', err);
+    res.send({status: 'failed', message: err.message});
+});
 
 module.exports = app;

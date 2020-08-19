@@ -6,19 +6,20 @@ const system_path = require('../system/path');
 
 
 router.use((req, res, next) => {
-    console.debug(req.path);
     if (req.path !== '/login') {
         if (req.headers['authorization']) {
             system_authentication.tokenHandler(req, res, next);
         } else {
-            res.send({ status: result.FAILED, message: 'this route is private' });
+            res.send({ status: result.FAILED, message: 'You need to be authenticated to access this method' });
         }
     } else {
         next();
     }
 });
 
-router.get('/login', system_authentication.credentialHandler);
+router.get('/login', (req, res) => {
+    system_authentication.credentialHandler(req, res);
+});
 
 router.get('/new/channel/:channel', (req, res) => {
     const channel = req.params['channel'];
@@ -37,18 +38,16 @@ router.post('/post/:channel/:version', (req, res) => {
             if (is_created) {
                 const file = req.files.archive;
                 system_path.isFileAlreadyUpload(channel, version, file.name).then((exist) => {
-                    if (!exist) {
-                        system_path.copyFile(channel, version, file, (err) => {
-                            if (!err) {
-                                res.send({ status: result.SUCCESS, message: '' });
-                            } else {
-                                res.send({ status: result.FAILED, message: err.message });
-                            }
-                        });
-                    } else {
-                        res.send({ status: result.FAILED,
-                            message: 'This file already exists. Delete it to upload a new copy' });
+                    if (exist) {
+
                     }
+                    system_path.copyFile(channel, version, file, (err) => {
+                        if (!err) {
+                            res.send({ status: result.SUCCESS, message: 'File added successfully' });
+                        } else {
+                            res.send({ status: result.FAILED, message: err.message });
+                        }
+                    });
                 });
             } else {
                 res.send({ status: result.FAILED, message: 'This channel does not exist' });

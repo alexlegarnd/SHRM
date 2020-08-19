@@ -51,10 +51,8 @@ class Path {
 
     static async isFileAlreadyUpload(c, v, fn) {
         const path = tools.addTrailingSeparatorPath(configuration.getProperty('repo_path'));
-        if (!fs.existsSync(`${path}${c}/${v}`)) {
-            if (!fs.existsSync(`${path}${c}/${v}/${fn}`)) {
-                return false;
-            }
+        if (!fs.existsSync(`${path}${c}/${v}/${fn}`)) {
+            return false;
         }
         return true;
     }
