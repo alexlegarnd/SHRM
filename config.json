@@ -3,5 +3,7 @@
   "repo_name": "Test Repo",
   "port": "8080",
   "debug": true,
-  "token_validity":  "2h"
+  "token_validity":  "2h",
+  "password_hash_algorithm": "sha256",
+  "private": true
 }

@@ -1,9 +1,32 @@
 const express = require('express');
 const router = express.Router();
 const configuration = require('../system/configuration');
-const result = require('../system/request.result.enum');
+const result = require('../system/result.enum');
 const tools = require('../system/tools');
 const system_path = require('../system/path');
+const system_authentication = require('../system/authentication');
+
+const isPrivate = configuration.getProperty('private', false);
+
+router.use((req, res, next) => {
+  if ((req.path !== '/login') && isPrivate) {
+    if (req.headers['authorization']) {
+      system_authentication.tokenHandler(req, res, next);
+    } else {
+      res.send({ status: result.FAILED, message: 'You need to be authenticated to access this method' });
+    }
+  } else {
+    next();
+  }
+});
+
+router.post('/login', (req, res) => {
+  if (isPrivate) {
+    system_authentication.credentialHandler(req, res);
+  } else {
+    res.send({status: result.FAILED, message: "This repository is public, no token is needed"});
+  }
+});
 
 router.get('/get/:channel/:version/:file', function(req, res) {
   const channel = req.params['channel'];

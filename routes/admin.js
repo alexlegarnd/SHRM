@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const result = require('../system/request.result.enum');
+const result = require('../system/result.enum');
 const system_authentication = require('../system/authentication');
 const system_path = require('../system/path');
 const system_file = require('../system/file');
@@ -18,8 +18,8 @@ router.use((req, res, next) => {
     }
 });
 
-router.get('/login', (req, res) => {
-    system_authentication.credentialHandler(req, res);
+router.post('/login', (req, res) => {
+    system_authentication.adminCredentialHandler(req, res);
 });
 
 router.get('/new/channel/:channel', (req, res) => {

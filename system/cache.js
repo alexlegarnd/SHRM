@@ -157,13 +157,13 @@ class Cache {
             }
             for (const file of files) {
                 if ((file !== '.shrm')) {
-                    logger.info(Cache.CLASSNAME, `[Rebuild] Discovered channel: ${file}`)
+                    logger.info(Cache.CLASSNAME, `[Rebuild] Channel found: ${file}`)
                     const c = {
                         name: file,
                         type: 'channel',
                         item_child: []
                     };
-                    this.rebuildFolder(`${repo}${file}`, c, 'version')
+                    this.rebuildVersionsCache(`${repo}${file}`, c)
                     this.cache.push(c);
                 }
             }
@@ -171,22 +171,45 @@ class Cache {
         this.saveCache();
     }
 
-    rebuildFolder(path, c, type) {
+    rebuildVersionsCache(path, c) {
         fs.readdir(path, (err, files) => {
             if (err) {
                 logger.error(Cache.CLASSNAME, err);
                 return;
             }
             for (const file of files) {
-                if (!file.endsWith('.md5') && !file.endsWith('.sha')) {
-                    logger.info(Cache.CLASSNAME, `[Rebuild] Discovered ${type}: ${file}`)
-                    const n = {
+                if (fs.lstatSync(`${path}/${file}`).isDirectory()) {
+                    logger.info(Cache.CLASSNAME, `[Rebuild] Version found: ${file}`)
+                    const v = {
                         name: file,
-                        type: type,
+                        type: 'version',
                         item_child: []
                     };
-                    this.rebuildFolder(`${path}/${file}`, c, 'file')
-                    c.item_child.push(n);
+                    this.rebuildFilesCache(`${path}/${file}`, v)
+                    c.item_child.push(v);
+                }
+            }
+        });
+    }
+
+    rebuildFilesCache(path, v) {
+        fs.readdir(path, (err, files) => {
+            if (err) {
+                logger.error(Cache.CLASSNAME, err);
+                return;
+            }
+            for (const file of files) {
+                if (!file.endsWith('.md5') && !file.endsWith('.sha') && !file.endsWith('.history')) {
+                    if (fs.lstatSync(`${path}/${file}`).isFile()) {
+                        logger.info(Cache.CLASSNAME, `[Rebuild] File found: ${file}`);
+                        const f = {
+                            name: file,
+                            type: 'file'
+                        };
+                        v.item_child.push(f);
+                    } else {
+                        logger.info(Cache.CLASSNAME, `[Rebuild] [Skipped] Dirty file found: ${file}`)
+                    }
                 }
             }
         });

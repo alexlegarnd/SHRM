@@ -1,54 +1,49 @@
 const jwt = require('jsonwebtoken');
-const config = require('../config');
-const result = require('../system/request.result.enum');
+const result = require('./result.enum');
 const configuration = require('./configuration');
-const tools = require('./tools');
-const crypto = require('crypto');
-const fs = require('fs');
-const logger = require('./logger');
+const accounts = require('./account.manager');
 
 const ADMIN = '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918';
 
 
 class Authentication {
 
-    users = {};
     token_validity = configuration.getProperty('token_validity', '2h');
-    app_folder = `${tools.addTrailingSeparatorPath(configuration.getProperty('repo_path'))}.shrm`
-    users_file = `${this.app_folder}/.administrators`;
     static CLASSNAME = 'Authentication';
 
-    constructor() {
-        if (fs.existsSync(this.users_file)) {
-            const data = fs.readFileSync(this.users_file, 'UTF-8');
-            const lines = data.split(/\r?\n/);
+    adminCredentialHandler (req, res) {
+        const username = req.body['username'];
+        const password = req.body['password'];
 
-            for (const line of lines) {
-                // Works with "username_hash|password_hash"
-                const couple = line.split(/\|/);
-                if (couple.length === 2) {
-                    this.users[couple[0]] = couple[1];
-                }
+        if (username && password) {
+            if (accounts.authenticateAdministrator(username, password)) {
+                let token = jwt.sign(
+                    { username: username },
+                    configuration.jwt_secret_key,
+                    { expiresIn: this.token_validity }
+                );
+                res.send({
+                    status: result.SUCCESS,
+                    message: `Authentication successful, this token is valid ${this.token_validity}`,
+                    token: token
+                });
+            } else {
+                res.send({ status: result.FAILED, message: 'Incorrect username or password'});
             }
-            logger.info(Authentication.CLASSNAME, `${Object.keys(this.users).length} users loaded`)
         } else {
-            this.users[ADMIN] = ADMIN;
-            fs.writeFile(this.users_file, `${ADMIN}|${ADMIN}`, function (err) {
-                if (err) return console.log(err);
-            });
+            res.send({ status: result.FAILED, message: 'Username or password missing'});
         }
     }
 
-
     credentialHandler (req, res) {
-        const username = req.headers['x-username'];
-        const password = req.headers['x-password'];
+        const username = req.body['username'];
+        const password = req.body['password'];
 
         if (username && password) {
-            if (this.authenticate(username, password)) {
+            if (accounts.authenticate(username, password)) {
                 let token = jwt.sign(
                     { username: username },
-                    config.secret,
+                    configuration.jwt_secret_key,
                     { expiresIn: this.token_validity }
                 );
                 res.send({
@@ -72,7 +67,7 @@ class Authentication {
         }
 
         if (token) {
-            jwt.verify(token, config.secret, (err) => {
+            jwt.verify(token, configuration.jwt_secret_key, (err) => {
                 if (err) {
                     res.send({ status: result.FAILED, message: err.message });
                     return;
@@ -82,16 +77,6 @@ class Authentication {
         } else {
             res.send({ status: result.FAILED, message: 'Authentication failed: no token found' });
         }
-    }
-
-    authenticate(username, password) {
-        const uSum = crypto.createHash('sha256');
-        const pSum = crypto.createHash('sha256');
-        uSum.update(username);
-        pSum.update(password)
-        const uHash = uSum.digest('hex');
-        const pHash = pSum.digest('hex');
-        return (this.users[uHash] && this.users[uHash] === pHash);
     }
 
 }
