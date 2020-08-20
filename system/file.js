@@ -1,6 +1,8 @@
 const crypto = require('crypto');
 const fs = require('fs');
-const logger = require('./logger')
+const logger = require('./logger');
+const configuration = require('./configuration');
+const tools = require('./tools');
 
 class File {
 
@@ -10,7 +12,10 @@ class File {
         const md5_filename = `${file.name}.md5`
         const md5_content = `${file.md5} *${file.name}`;
         fs.writeFile(`${folder}/${md5_filename}`, md5_content, function (err) {
-            if (err) return console.log(err);
+            if (err) {
+                logger.error(File.CLASSNAME, err);
+                return;
+            }
             logger.info(File.CLASSNAME, `Hash MD5 created for ${file.name}`);
         });
     }
@@ -35,8 +40,17 @@ class File {
         });
     }
 
-    static addToHistory(c, v, f) {
-        //fs.renameSync()
+    static async addToHistory(c, v, f) {
+        let path = tools.addTrailingSeparatorPath(configuration.getProperty('repo_path'));
+        path = `${path}${c}/${v}/`;
+        if (fs.existsSync(`${path}${f}`)) {
+            if (!fs.existsSync(`${path}.history`)) {
+                fs.mkdirSync(`${path}.history`);
+            }
+            const n = fs.readdirSync(`${path}.history`).length + 1;
+            fs.renameSync(`${path}${f}`, `${path}.history/${f}.version${n}`);
+            logger.info(File.CLASSNAME, `Moving version ${n} to history`);
+        }
     }
 
 }

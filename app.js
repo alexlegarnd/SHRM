@@ -18,7 +18,7 @@ app.use(fileupload({
 }));
 
 
-app.use('/repo', indexRouter);
+app.use('/', indexRouter);
 app.use('/admin', adminRouter);
 
 app.use((err, req, res, next) => {

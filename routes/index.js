@@ -1,17 +1,64 @@
 const express = require('express');
 const router = express.Router();
+const configuration = require('../system/configuration');
+const result = require('../system/request.result.enum');
+const tools = require('../system/tools');
+const system_path = require('../system/path');
 
+router.get('/get/:channel/:version/:file', function(req, res) {
+  const channel = req.params['channel'];
+  const version = req.params['version'];
+  const file = req.params['file'];
+  const path = tools.addTrailingSeparatorPath(configuration.getProperty('repo_path'));
+  system_path.isFileAlreadyUpload(channel, version, file).then((exist) => {
+    if (exist) {
+      if (!file.endsWith('.md5') && !file.endsWith('.sha')) {
+        res.sendFile(`${path}${channel}/${version}/${file}`);
+      } else {
+        res.send({status: result.SUCCESS, message: "This file exist but for getting hash " +
+              "use '/md5' or '/sha' instead of '/get'"});
+      }
 
-router.get('/:channel/:version/:file', function(req, res) {
-  res.render('index', { title: 'Express' });
+    } else {
+      res.send({status: result.FAILED, message: 'file not found'});
+    }
+  });
 });
 
-router.get('/:channel/:version/:file/md5', function(req, res) {
-  res.render('index', { title: 'Express' });
+router.get('/md5/:channel/:version/:file', function(req, res) {
+  const channel = req.params['channel'];
+  const version = req.params['version'];
+  const file = req.params['file'];
+  const path = tools.addTrailingSeparatorPath(configuration.getProperty('repo_path'));
+  system_path.isFileAlreadyUpload(channel, version, file).then((exist) => {
+    if (exist) {
+      if (!file.endsWith('.md5') && !file.endsWith('.sha')) {
+        res.sendFile(`${path}${channel}/${version}/${file}.md5`);
+      } else {
+        res.send({status: result.SUCCESS, message: "Try without .md5 or .sha extension"});
+      }
+    } else {
+      res.send({status: result.FAILED, message: 'file not found'});
+    }
+  });
 });
 
-router.get('/:channel/:version/:file/sha', function(req, res) {
-  res.render('index', { title: 'Express' });
+router.get('/sha/:channel/:version/:file', function(req, res) {
+  const channel = req.params['channel'];
+  const version = req.params['version'];
+  const file = req.params['file'];
+  const path = tools.addTrailingSeparatorPath(configuration.getProperty('repo_path'));
+  system_path.isFileAlreadyUpload(channel, version, file).then((exist) => {
+    if (exist) {
+      if (!file.endsWith('.md5') && !file.endsWith('.sha')) {
+        res.sendFile(`${path}${channel}/${version}/${file}.sha`);
+      } else {
+        res.send({status: result.SUCCESS, message: "Try without .md5 or .sha extension"});
+      }
+    } else {
+      res.send({status: result.FAILED, message: 'file not found'});
+    }
+  });
 });
 
 module.exports = router;

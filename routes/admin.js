@@ -3,6 +3,7 @@ const router = express.Router();
 const result = require('../system/request.result.enum');
 const system_authentication = require('../system/authentication');
 const system_path = require('../system/path');
+const system_file = require('../system/file');
 
 
 router.use((req, res, next) => {
@@ -37,10 +38,7 @@ router.post('/post/:channel/:version', (req, res) => {
         system_path.isChannelCreated(channel).then((is_created) => {
             if (is_created) {
                 const file = req.files.archive;
-                system_path.isFileAlreadyUpload(channel, version, file.name).then((exist) => {
-                    if (exist) {
-
-                    }
+                system_file.addToHistory(channel, version, file.name).then(() => {
                     system_path.copyFile(channel, version, file, (err) => {
                         if (!err) {
                             res.send({ status: result.SUCCESS, message: 'File added successfully' });
