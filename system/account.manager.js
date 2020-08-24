@@ -3,6 +3,7 @@ const tools = require('./tools');
 const fs = require('fs');
 const crypto = require('crypto');
 const logger = require('./logger');
+const passwordHasher = require('./password.hasher');
 const { v4: uuidv4 } = require('uuid');
 
 
@@ -69,9 +70,7 @@ class AccountManager {
         if (!Array.isArray(memberOf)) {
             memberOf = [memberOf];
         }
-        const pSum = crypto.createHash(this.algorithm);
-        pSum.update(password);
-        const hash = pSum.digest('hex');
+        const hash = await passwordHasher.getHash(password);
         const u = {
             userId: uuidv4(),
             memberOf: memberOf,
@@ -100,12 +99,9 @@ class AccountManager {
 
     async authenticate(username, password) {
         logger.debug(AccountManager.CLASSNAME, `Authentication of ${username} as user`);
-        const pSum = crypto.createHash(this.algorithm);
-        pSum.update(password);
-        const hash = pSum.digest('hex');
         const user = await this.getUser(username);
         if (user) {
-            return (user.password === hash);
+            return await passwordHasher.verify(password, user.password);
         }
         logger.debug(AccountManager.CLASSNAME, `User ${username} not found`);
         return false;
@@ -113,15 +109,12 @@ class AccountManager {
 
     async authenticateAdministrator(username, password) {
         logger.debug(AccountManager.CLASSNAME, `Authentication of ${username} as administrator`);
-        const pSum = crypto.createHash(this.algorithm);
-        pSum.update(password);
-        const hash = pSum.digest('hex');
         const user = await this.getUser(username);
         if (user) {
             const userGroups = await this.getGroups(user);
             let isAdmin = false;
             userGroups.forEach((g) => isAdmin = (g.role === 'admin') ? true : isAdmin);
-            return (user.password === hash) && isAdmin;
+            return await passwordHasher.verify(password, user.password) && isAdmin;
         }
         logger.debug(AccountManager.CLASSNAME, `Administrator ${username} not found`);
         return false;

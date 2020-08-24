@@ -11,7 +11,7 @@ class Configuration {
     }
 
     getProperty(name, default_value = undefined) {
-        if (this.properties[name]) {
+        if (this.properties[name] !== undefined) {
             return this.properties[name];
         }
         return default_value;
@@ -37,6 +37,12 @@ class Configuration {
             result += characters.charAt(Math.floor(Math.random() * characters.length));
         }
         return result;
+    }
+
+    isLocalhost(req){
+        const ip = req.connection.remoteAddress;
+        const host = req.get('host');
+        return ip === "127.0.0.1" || ip === "::ffff:127.0.0.1" || ip === "::1" || host.indexOf("localhost") !== -1;
     }
 }
 

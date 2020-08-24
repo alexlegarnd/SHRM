@@ -1,9 +1,11 @@
 {
-  "repo_path": "C:/test_repo",
-  "repo_name": "Test Repo",
+  "repo_path": "C:/chronos-repo",
+  "repo_name": "Chronos",
   "port": "3162",
-  "debug": true,
+  "debug": false,
   "token_validity":  "2h",
-  "password_hash_algorithm": "sha256",
-  "private": false
+  "password_hash_algorithm": "bcrypt",
+  "bcrypt_salt": 10,
+  "private": false,
+  "admin_from_localhost_only": true
 }

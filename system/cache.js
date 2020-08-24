@@ -7,11 +7,11 @@ class Cache {
 
     static CLASSNAME = 'Cache';
 
-    cache = []
+    cache = [];
 
     save_timeout;
 
-    app_folder = `${tools.addTrailingSeparatorPath(configuration.getProperty('repo_path'))}.shrm`
+    app_folder = `${tools.addTrailingSeparatorPath(configuration.getProperty('repo_path'))}.shrm`;
 
     constructor() {
         if(fs.existsSync(`${this.app_folder}/.cache`)) {
@@ -213,6 +213,29 @@ class Cache {
                 }
             }
         });
+    }
+
+    async getChannels() {
+        return this.cache.map((c) => c.name);
+    }
+
+    async getVersions(channel) {
+        const channels = this.cache.filter((c) => c.name === channel);
+        if (channels.length === 1) {
+            return channels[0].item_child.map((v) => v.name);
+        }
+        return [];
+    }
+
+    async getFiles(channel, version) {
+        const channels = this.cache.filter((c) => c.name === channel);
+        if (channels.length === 1) {
+            const versions = channels[0].item_child.filter((v) => v.name === version);
+            if (versions.length === 1) {
+                return versions[0].item_child.map((f) => f.name);
+            }
+        }
+        return [];
     }
 }
 

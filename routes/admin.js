@@ -6,9 +6,19 @@ const system_authentication = require('../system/authentication');
 const accounts = require('../system/account.manager');
 const system_path = require('../system/path');
 const system_file = require('../system/file');
+const system_currentversion = require('../system/currentversion.manager');
+const configuration = require('../system/configuration');
+const logger = require('../system/logger');
+
+const adminFromLocalhost = configuration.getProperty('admin_from_localhost_only', true);
 
 router.use((req, res, next) => {
-    system_authentication.authenticationHandler(req, res, next);
+    if (!adminFromLocalhost || (adminFromLocalhost && configuration.isLocalhost(req))) {
+        system_authentication.authenticationHandler(req, res, next);
+    } else {
+        logger.warning('Administration Controller', 'Remote request dropped. ' +
+            'To allow remote administration, set admin_from_localhost_only to false');
+    }
 });
 
 router.get('/uptime', (req, res) => {
@@ -115,6 +125,17 @@ router.post('/group/new/', (req, res) => {
             res.send({ status: result.FAILED, message: `Group: ${group} already exist` });
         }
     });
+});
+
+router.post('/set/current/:channel', (req, res) => {
+    const channel = req.params['channel'];
+    const version = req.body['version'];
+    if (version) {
+        system_currentversion.set_current_version(channel, version);
+        res.send({ status: result.SUCCESS, message: `Channel current version set to ${channel}/${version}` });
+    } else {
+        res.send({ status: result.FAILED, message: 'Version is missing, check the body of the request' });
+    }
 });
 
 
