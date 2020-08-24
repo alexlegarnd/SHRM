@@ -2,8 +2,13 @@ const fs = require('fs');
 
 
 class Configuration {
+
     properties = {};
     jwt_secret_key = '';
+
+    constructor() {
+        this.load();
+    }
 
     getProperty(name, default_value = undefined) {
         if (this.properties[name]) {
@@ -35,7 +40,4 @@ class Configuration {
     }
 }
 
-config = new Configuration();
-config.load();
-
-module.exports = config;
+module.exports = new Configuration();

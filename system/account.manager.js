@@ -23,72 +23,130 @@ class AccountManager {
             const object = JSON.parse(buffer.toString('utf8'));
             this.groups = object.groups;
             this.users = object.users;
+            logger.info(AccountManager.CLASSNAME, `${this.groups.length} groups loaded`);
+            logger.info(AccountManager.CLASSNAME, `${this.users.length} users loaded`);
         } else {
-            this.resetToDefaultAccount();
-            this.saveAccount();
+            this.resetToDefaultAccount().then(() => this.saveAccount());
         }
-        logger.info(AccountManager.CLASSNAME, `${this.groups.length} groups loaded`);
-        logger.info(AccountManager.CLASSNAME, `${this.users.length} users loaded`);
     }
 
-    resetToDefaultAccount() {
-        this.resetDefaultGroups();
-        this.resetDefaultUser();
+    async resetToDefaultAccount() {
+        await this.resetDefaultGroups();
+        await this.resetDefaultUser();
     }
 
-    resetDefaultGroups() {
-        this.groups = [
-            {
-                groupId: uuidv4(),
-                name: 'Administrators',
-                role: 'admin',
-                access: [
-                    '*'
-                ]
+    async resetDefaultGroups() {
+        this.groups = [];
+        await this.createGroup('Administrators', 'admin');
+    }
+
+    async resetDefaultUser() {
+        this.users = [];
+        await this.createUser('admin', 'admin', this.groups[0].groupId, 'Administrator');
+    }
+
+    async createGroup(groupName, role, access = '*') {
+        if (role === 'admin') {
+            access = ['*'];
+        } else {
+            if (!Array.isArray(access)) {
+                access = [access];
             }
-        ];
+        }
+        const g = {
+            groupId: uuidv4(),
+            name: groupName,
+            role: role,
+            access: access
+        }
+        this.groups.push(g);
     }
 
-    resetDefaultUser() {
-        this.users = [
-            {
-                userId: uuidv4(),
-                memberOf: [
-                    this.groups[0].groupId
-                ],
-                fullname: 'Administrator',
-                username: 'admin',
-                password: '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918'
-            }
-        ];
-    }
-
-    authenticate(username, password) {
+    async createUser(username, password, memberOf, fullname) {
+        if (!fullname) {
+            fullname = username;
+        }
+        if (!Array.isArray(memberOf)) {
+            memberOf = [memberOf];
+        }
         const pSum = crypto.createHash(this.algorithm);
         pSum.update(password);
         const hash = pSum.digest('hex');
-        const user = this.getUser(username);
-        if (user) {
-            return (user.password === hash);
+        const u = {
+            userId: uuidv4(),
+            memberOf: memberOf,
+            fullname: fullname,
+            username: username,
+            password: hash
+        }
+        this.users.push(u);
+    }
+
+    async addUserToGroup(user, group) {
+        let gId = undefined;
+        for (const g of this.groups) {
+            if (g.groupId === group) {
+                gId = g.groupId;
+            }
+        }
+        if (gId) {
+            const alreadyAdded = (user.memberOf.filter((g) => g === gId).length > 0);
+            if (!alreadyAdded) {
+                user.memberOf.push(gId);
+            }
         }
         return false;
     }
 
-    authenticateAdministrator(username, password) {
+    async authenticate(username, password) {
+        logger.debug(AccountManager.CLASSNAME, `Authentication of ${username} as user`);
         const pSum = crypto.createHash(this.algorithm);
         pSum.update(password);
         const hash = pSum.digest('hex');
-        const user = this.getUser(username);
+        const user = await this.getUser(username);
         if (user) {
-            const userGroups = this.getGroups(user);
+            return (user.password === hash);
+        }
+        logger.debug(AccountManager.CLASSNAME, `User ${username} not found`);
+        return false;
+    }
+
+    async authenticateAdministrator(username, password) {
+        logger.debug(AccountManager.CLASSNAME, `Authentication of ${username} as administrator`);
+        const pSum = crypto.createHash(this.algorithm);
+        pSum.update(password);
+        const hash = pSum.digest('hex');
+        const user = await this.getUser(username);
+        if (user) {
+            const userGroups = await this.getGroups(user);
             let isAdmin = false;
             userGroups.forEach((g) => isAdmin = (g.role === 'admin') ? true : isAdmin);
             return (user.password === hash) && isAdmin;
         }
+        logger.debug(AccountManager.CLASSNAME, `Administrator ${username} not found`);
         return false;
     }
 
-    getUser(username) {
+    async hasAccess(channel, username = 'anonymous') {
+        logger.debug(AccountManager.CLASSNAME, `Checking access of ${username} for ${channel} channel`);
+        const isPrivate = configuration.getProperty('private', false);
+        if (isPrivate) {
+            const user = await this.getUser(username);
+            if (user) {
+                let access = false;
+                const groups = await this.getGroups(user);
+                for (const g of groups) {
+                    access = (g.access.includes('*')) ? true : (g.access.includes(channel)) ? true : access;
+                }
+                return access;
+            }
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    async getUser(username) {
         const userFiltered = this.users.filter((u) => u.username === username);
         if (userFiltered.length === 1) {
             return userFiltered[0];
@@ -96,7 +154,7 @@ class AccountManager {
         return undefined;
     }
 
-    getGroups(user) {
+    async getGroups(user) {
         return user.memberOf.map((gId) => {
             const groupsFiltered = this.groups.filter((g) => g.groupId === gId);
             if (groupsFiltered.length === 1) {
@@ -104,7 +162,20 @@ class AccountManager {
             }
             return undefined;
         });
+    }
 
+    async groupExist(groupId) {
+        return (this.groups.filter((g) => g.groupId === groupId).length > 0);
+    }
+
+    async deleteUser(username) {
+        const user = await this.getUser(username);
+        const i = this.users.indexOf(user);
+        if (i !== -1) {
+            this.users = this.users.slice(i, 1);
+            return true;
+        }
+        return false;
     }
 
     saveAccount() {

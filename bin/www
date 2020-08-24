@@ -1,25 +1,42 @@
 #!/usr/bin/env node
 
+const VERSION = require('../version');
+const DEFAULT_PORT = 3162;
+
+console.log('Simple HTTP Repository Manager (SHRM)');
+console.log(`SHRM version: ${VERSION}`);
+console.log(`Node.js version: ${process.version} (${process.platform} ${process.arch})`);
+console.log(`V8 version: ${process.versions.v8}`);
+console.log('Github: https://github.com/alexlegarnd/SHRM');
+console.log('');
+console.log(`${new Date().toISOString()} INFO [SHRM] STATE001 application is starting`);
+const start_time = Date.now();
+
 /**
  * Module dependencies.
  */
 const app = require('../app');
 const http = require('http');
+const configuration = require('../system/configuration');
 const system_path = require('../system/path');
 const logger = require('../system/logger');
-const configuration = require('../system/configuration');
 
 /**
- * Get port from environment and store in Express.
+ * Create repo directory if not exist
  */
-const port = normalizePort(configuration.getProperty('port', 8080));
+system_path.createRepoIfNotExist();
+
+/**
+ * Get port from configuration file and store in Express.
+ */
+const port = normalizePort(configuration.getProperty('port', DEFAULT_PORT));
 app.set('port', port);
 
 /**
  * Create HTTP server.
  */
 const server = http.createServer(app);
-system_path.createRepoIfNotExist();
+
 /**
  * Listen on provided port, on all network interfaces.
  */
@@ -29,7 +46,7 @@ server.on('error', onError);
 server.on('listening', onListening);
 
 /**
- * Normalize a port into a number, string, or false.
+ * Normalize a port into a number, string, or default.
  */
 
 function normalizePort(val) {
@@ -45,7 +62,7 @@ function normalizePort(val) {
     return port;
   }
 
-  return false;
+  return DEFAULT_PORT;
 }
 
 /**
@@ -54,25 +71,27 @@ function normalizePort(val) {
 
 function onError(error) {
   if (error.syscall !== 'listen') {
-    throw error;
+    logger.error('SHRM', `STATE006 ${error.message}`);
+    process.exit(6);
   }
 
   const bind = typeof port === 'string'
-      ? 'Pipe ' + port
-      : 'Port ' + port;
+      ? 'pipe ' + port
+      : 'port ' + port;
 
   // handle specific listen errors with friendly messages
   switch (error.code) {
     case 'EACCES':
-      logger.error('SHRM', bind + ' requires elevated privileges');
-      process.exit(1);
+      logger.error('SHRM', `STATE003 using ${bind} requires elevated privileges`);
+      process.exit(3);
       break;
     case 'EADDRINUSE':
-      logger.error('SHRM', bind + ' is already in use');
-      process.exit(1);
+      logger.error('SHRM', `STATE004 ${bind} is already in use`);
+      process.exit(4);
       break;
     default:
-      throw error;
+      logger.error('SHRM', `STATE005 ${error.message}`);
+      process.exit(5);
   }
 }
 
@@ -85,5 +104,6 @@ function onListening() {
   const bind = typeof addr === 'string'
       ? 'pipe ' + addr
       : 'port ' + addr.port;
-  logger.info('SHRM', 'Listening on ' + bind);
+  logger.info('SHRM', 'listening on ' + bind);
+  logger.info('SHRM', `STATE002 application started in ${Date.now() - start_time} ms`);
 }

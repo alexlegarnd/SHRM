@@ -31,7 +31,7 @@ class Cache {
                 item_child: []
             };
             this.cache.push(c);
-            logger.info(Cache.CLASSNAME, `Adding new channel: {channel: ${channel_name}}`);
+            logger.debug(Cache.CLASSNAME, `Adding new channel: {channel: ${channel_name}}`);
             this.saveCache();
             return true;
         }
@@ -51,7 +51,7 @@ class Cache {
                     item_child: []
                 }
                 c.item_child.push(v);
-                logger.info(Cache.CLASSNAME, `Adding new version: {channel: ${channel_name},version: ${version_name}}`);
+                logger.debug(Cache.CLASSNAME, `Adding new version: {channel: ${channel_name},version: ${version_name}}`);
                 this.saveCache();
                 return true;
             }
@@ -75,7 +75,7 @@ class Cache {
                         type: 'file'
                     }
                     v.item_child.push(f);
-                    logger.info(Cache.CLASSNAME,
+                    logger.debug(Cache.CLASSNAME,
                         `Adding new file: {channel: ${channel_name},version: ${version_name}, file: ${file_name}}`);
                     this.saveCache();
                 }
@@ -97,7 +97,7 @@ class Cache {
                     logger.error(Cache.CLASSNAME, err);
                     return;
                 }
-                logger.info(Cache.CLASSNAME, 'Cache saved');
+                logger.debug(Cache.CLASSNAME, 'Cache saved');
             });
         }, configuration.getProperty('timeout_saving', 3500));
     }
@@ -157,7 +157,7 @@ class Cache {
             }
             for (const file of files) {
                 if ((file !== '.shrm')) {
-                    logger.info(Cache.CLASSNAME, `[Rebuild] Channel found: ${file}`)
+                    logger.debug(Cache.CLASSNAME, `[Rebuild] Channel found: ${file}`)
                     const c = {
                         name: file,
                         type: 'channel',
@@ -179,7 +179,7 @@ class Cache {
             }
             for (const file of files) {
                 if (fs.lstatSync(`${path}/${file}`).isDirectory()) {
-                    logger.info(Cache.CLASSNAME, `[Rebuild] Version found: ${file}`)
+                    logger.debug(Cache.CLASSNAME, `[Rebuild] Version found: ${file}`)
                     const v = {
                         name: file,
                         type: 'version',
@@ -201,14 +201,14 @@ class Cache {
             for (const file of files) {
                 if (!file.endsWith('.md5') && !file.endsWith('.sha') && !file.endsWith('.history')) {
                     if (fs.lstatSync(`${path}/${file}`).isFile()) {
-                        logger.info(Cache.CLASSNAME, `[Rebuild] File found: ${file}`);
+                        logger.debug(Cache.CLASSNAME, `[Rebuild] File found: ${file}`);
                         const f = {
                             name: file,
                             type: 'file'
                         };
                         v.item_child.push(f);
                     } else {
-                        logger.info(Cache.CLASSNAME, `[Rebuild] [Skipped] Dirty file found: ${file}`)
+                        logger.debug(Cache.CLASSNAME, `[Rebuild] [Skipped] Dirty file found: ${file}`)
                     }
                 }
             }
