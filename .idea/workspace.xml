@@ -20,17 +20,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="25b0b385-cdf1-4e4f-b809-d1289d1e968a" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/system/currentversion.manager.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/system/password.hasher.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config.json" beforeDir="false" afterPath="$PROJECT_DIR$/config.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/admin.js" beforeDir="false" afterPath="$PROJECT_DIR$/routes/admin.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/routes/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/system/account.manager.js" beforeDir="false" afterPath="$PROJECT_DIR$/system/account.manager.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/system/cache.js" beforeDir="false" afterPath="$PROJECT_DIR$/system/cache.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/system/configuration.js" beforeDir="false" afterPath="$PROJECT_DIR$/system/configuration.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -86,7 +77,8 @@
       <workItem from="1597929324883" duration="2933000" />
       <workItem from="1597941049823" duration="6511000" />
       <workItem from="1598272240149" duration="9399000" />
-      <workItem from="1598291683003" duration="5546000" />
+      <workItem from="1598291683003" duration="8732000" />
+      <workItem from="1598544836159" duration="315000" />
     </task>
     <servers />
   </component>
@@ -110,30 +102,31 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="499" y="159" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1536.824@0.0.1536.824" timestamp="1597941430780" />
-    <state width="2539" height="372" key="GridCell.Tab.0.bottom" timestamp="1598297863269">
+    <state width="2539" height="372" key="GridCell.Tab.0.bottom" timestamp="1598301143286">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state width="1515" height="195" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1597947677195" />
-    <state width="2539" height="372" key="GridCell.Tab.0.bottom/3840.1.1536.816/0.0.2560.1400@0.0.2560.1400" timestamp="1598297863269" />
-    <state width="2539" height="372" key="GridCell.Tab.0.center" timestamp="1598297863268">
+    <state width="2539" height="372" key="GridCell.Tab.0.bottom/3840.1.1536.816/0.0.2560.1400@0.0.2560.1400" timestamp="1598301143286" />
+    <state width="2539" height="372" key="GridCell.Tab.0.center" timestamp="1598301143285">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state width="1515" height="195" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1597947677194" />
-    <state width="2539" height="372" key="GridCell.Tab.0.center/3840.1.1536.816/0.0.2560.1400@0.0.2560.1400" timestamp="1598297863268" />
-    <state width="2539" height="372" key="GridCell.Tab.0.left" timestamp="1598297863268">
+    <state width="2539" height="372" key="GridCell.Tab.0.center/3840.1.1536.816/0.0.2560.1400@0.0.2560.1400" timestamp="1598301143285" />
+    <state width="2539" height="372" key="GridCell.Tab.0.left" timestamp="1598301143285">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state width="1515" height="195" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1597947677194" />
-    <state width="2539" height="372" key="GridCell.Tab.0.left/3840.1.1536.816/0.0.2560.1400@0.0.2560.1400" timestamp="1598297863268" />
-    <state width="2539" height="372" key="GridCell.Tab.0.right" timestamp="1598297863268">
+    <state width="2539" height="372" key="GridCell.Tab.0.left/3840.1.1536.816/0.0.2560.1400@0.0.2560.1400" timestamp="1598301143285" />
+    <state width="2539" height="372" key="GridCell.Tab.0.right" timestamp="1598301143285">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state width="1515" height="195" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1597947677195" />
-    <state width="2539" height="372" key="GridCell.Tab.0.right/3840.1.1536.816/0.0.2560.1400@0.0.2560.1400" timestamp="1598297863268" />
-    <state x="572" y="115" key="RollbackChangesDialog" timestamp="1597777337595">
-      <screen x="0" y="0" width="1536" height="824" />
+    <state width="2539" height="372" key="GridCell.Tab.0.right/3840.1.1536.816/0.0.2560.1400@0.0.2560.1400" timestamp="1598301143285" />
+    <state x="953" y="195" key="RollbackChangesDialog" timestamp="1598301131989">
+      <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="572" y="115" key="RollbackChangesDialog/0.0.1536.824@0.0.1536.824" timestamp="1597777337595" />
+    <state x="953" y="195" key="RollbackChangesDialog/3840.1.1536.816/0.0.2560.1400@0.0.2560.1400" timestamp="1598301131989" />
     <state x="782" y="346" key="SettingsEditor" timestamp="1598272285472">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>

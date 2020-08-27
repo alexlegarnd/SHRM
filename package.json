@@ -5,8 +5,14 @@
   "scripts": {
     "start": "node ./bin/www"
   },
+  "bin": {
+    "shrm": "bin/www"
+  },
   "pkg": {
-    "scripts": "build/**/*.js"
+    "scripts": "build/**/*.js",
+    "assets": [
+      "node_modules/**/*"
+    ]
   },
   "dependencies": {
     "bcrypt": "^5.0.0",
